@@ -4,12 +4,13 @@
                 我们得保证在 DOM 准备好之前他们不会被运行。
  */
 $(function() {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000; //网络延迟严重，更改默认间隔时间为15秒
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000; //网络延迟严重，更改默认间隔时间为10秒
+  const deInterval = 8000; //网络延迟，设置8秒，保证函数执行完成
   /**
    * @description 这是一个测试用例 - 其中包含了一定数量的测试。这个用例的测试
                   都是关于 Rss 源的定义的，也就是应用中的 allFeeds 变量。
    */
-  let oldContent;
+  //let oldContent;
   describe('RSS Feeds', function() {
     /**
      *@description 这是一个测试 - 它用来保证 allFeeds 变量被定义了而且不是空的。
@@ -73,17 +74,14 @@ $(function() {
                     里面至少有一个 .entry 的元素。
      */
     beforeEach(function(done) {
+      loadFeed(0);
       setTimeout(function() {
         done();
-      }, 8000); //网络问题，设置10秒，保证函数执行完成
+      }, deInterval);
     });
     it('loadFeed can work', function(done) {
-      //loadFeed(0);  //index.html初始化会调用该函数
-      oldContent = document.querySelector('.feed').children[0].children[0].children[0].textContent; //获取旧源第一个标题
       expect(document.querySelector('.feed').children[0].children[0].getAttribute('class')).toBe('entry');
       done();
-      let id = Math.round(Math.random() * 2) + 1; //1--3之间之间随机整数
-      loadFeed(id);
     });
   });
 
@@ -91,17 +89,23 @@ $(function() {
    *@description "New Feed Selection" 测试用例
    */
   describe('New Feed Selection', function() {
+    let oldContent;
     let newContent; //新源第一个标题
     /**
      *@description 这是一个测试保证当用 loadFeed 函数加载一个新源的时候内容会真的改变。
                    记住，loadFeed() 函数是异步的。
      */
     beforeEach(function(done) {
+      //获取旧源第一个标题
+      oldContent = document.querySelector('.feed').children[0].children[0].children[0].textContent;
+      let id = Math.round(Math.random() * 2) + 1; //1--3之间之间随机整数
+      loadFeed(id); //加载新源
       setTimeout(function() {
         done();
-      }, 8000);
+      }, deInterval);
     });
     it('when add new source,the content will change', function(done) {
+      //获取新源第一个标题内容
       newContent = document.querySelector('.feed').children[0].children[0].children[0].textContent;
       expect(oldContent).not.toBe(newContent); //旧源标题与新源标题不一样
       done();
